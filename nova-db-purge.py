@@ -30,6 +30,7 @@ from sqlalchemy import MetaData
 from sqlalchemy import select
 from sqlalchemy import Table
 from sqlalchemy import create_engine
+from sqlalchemy import inspect 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
@@ -145,7 +146,8 @@ def purger(db_url, date, file_name, cell, dryrun=False):
     'migrations',
     'virtual_interfaces',
     'block_device_mapping',
-    'security_group_instance_association']
+    'security_group_instance_association'
+    ]
 
     if date: 
         instances = get_instances_by_date(nova_db_meta, date, cell)
