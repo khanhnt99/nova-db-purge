@@ -193,7 +193,15 @@ def get_db_url(config_file):
     parser = configparser.ConfigParser()
     try:
         parser.read(config_file)
-        db_url = parser.get('database', 'connection')
+
+        # db_url = parser.get('database', 'connection')
+        db_url = "mysql+pymysql://{user}:{password}@{host}/{database_name}".format(
+            user = parser.get('database', 'user'),
+            password = parser.get('database', 'password'),
+            host = parser.get('database', 'host'),
+            database_name = parser.get('database', 'database_name')
+        )
+
     except:
         print ("ERROR: Check nova configuration file.")
         sys.exit(2)
