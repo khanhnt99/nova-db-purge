@@ -20,7 +20,7 @@
 
 import argparse
 import sys
-import ConfigParser
+import configparser
 import datetime
 
 from dateutil.parser import *
@@ -57,8 +57,8 @@ def delete_instance_actions_events(db_meta, instance_uuid):
         try:
             instance_actions_events.delete(instance_actions_events.c.action_id == action_id).execute()
         except Exception as e:
-            print "ERROR - delete - instance_actions_events with action_id: " + str(action_id)
-            print str(e)
+            print ("ERROR - delete - instance_actions_events with action_id: " + str(action_id))
+            print (str(e))
 
 
 def delete_instances(db_meta, instance_uuid):
@@ -67,8 +67,8 @@ def delete_instances(db_meta, instance_uuid):
     try:
         instances.delete(instances.c.uuid == instance_uuid).execute()
     except Exception as e:
-        print "ERROR - delete - instances with uuid: " + str(instance_uuid)
-        print str(e)
+        print ("ERROR - delete - instances with uuid: " + str(instance_uuid))
+        print (str(e))
 
 
 def delete_others(db_meta, table_name, instance_uuid):
@@ -77,8 +77,8 @@ def delete_others(db_meta, table_name, instance_uuid):
     try:
         table.delete(table.c.instance_uuid == instance_uuid).execute()
     except Exception as e:
-        print "ERROR - delete - " + table_name + " with instance_uuid: " + str(instance_uuid)
-        print str(e)
+        print ("ERROR - delete - " + table_name + " with instance_uuid: " + str(instance_uuid))
+        print (str(e))
 
 
 def delete_instance_id_mappings(db_meta, instance_uuid):
@@ -87,8 +87,8 @@ def delete_instance_id_mappings(db_meta, instance_uuid):
     try:
         table.delete(table.c.uuid == instance_uuid).execute()
     except Exception as e:
-        print "ERROR - delete - instance_id_mappings with instance_uuid: " + str(instance_uuid)
-        print str(e)
+        print ("ERROR - delete - instance_id_mappings with instance_uuid: " + str(instance_uuid))
+        print (str(e))
 
 
 def get_instances_by_date(db_meta, date, cell=None):
@@ -96,10 +96,10 @@ def get_instances_by_date(db_meta, date, cell=None):
 
     if cell == None:
         instances = select(columns=[instances.c.id, instances.c.uuid, instances.c.created_at, instances.c.deleted_at, instances.c.display_name, instances.c.cell_name],
-            whereclause=and_(instances.c.deleted_at < date, instances.c.deleted <> 0)).execute()
+            whereclause=and_(instances.c.deleted_at < date, instances.c.deleted != 0)).execute()
     else:
         instances = select(columns=[instances.c.id, instances.c.uuid, instances.c.created_at, instances.c.deleted_at, instances.c.display_name, instances.c.cell_name],
-            whereclause=and_(instances.c.deleted_at < date, instances.c.cell_name == cell, instances.c.deleted <> 0)).execute()
+            whereclause=and_(instances.c.deleted_at < date, instances.c.cell_name == cell, instances.c.deleted != 0)).execute()
     return instances
 
 
@@ -120,11 +120,11 @@ def get_instances_by_file(file_name, cell=None):
 def confirm_instance_delete_state(db_meta, instance_uuid):
     instances = Table('instances', db_meta, autoload=True)
     a = select([func.count()],
-        whereclause=and_(instances.c.uuid == instance_uuid, instances.c.deleted <> 0)).execute()
+        whereclause=and_(instances.c.uuid == instance_uuid, instances.c.deleted != 0)).execute()
 
     (i,) = a.first()
     if i == 0:
-        print "ERROR: instance uuid not found or not deleted: " + str(instance_uuid)
+        print ("ERROR: instance uuid not found or not deleted: " + str(instance_uuid))
         return False
     return True
 
@@ -185,17 +185,17 @@ def purger(db_url, date, file_name, cell, dryrun=False):
                 f.write(str(id) +','+ uuid +','+ str(created_at) +','+ str(deleted_at) +','+display_name +','+ cell_name+'\n')
 
     if not dryrun: nova_db_session.commit()
-    print "Instances filtered: " + str(instances_filtered)
-    print "Instances deleted : " + str(instances_deleted)
+    print ("Instances filtered: " + str(instances_filtered))
+    print ("Instances deleted : " + str(instances_deleted))
 
 
 def get_db_url(config_file):
-    parser = ConfigParser.SafeConfigParser()
+    parser = configparser.ConfigParser()
     try:
         parser.read(config_file)
         db_url = parser.get('database', 'connection')
     except:
-        print "ERROR: Check nova configuration file."
+        print ("ERROR: Check nova configuration file.")
         sys.exit(2)
     return db_url
 
